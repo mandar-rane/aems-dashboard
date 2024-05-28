@@ -12,9 +12,15 @@ const Home = () => {
   };
 
   const handleSessionStart = () => {
+    var hour = new Date().getHours();
+    var min = new Date().getMinutes();
+    var sec = new Date().getSeconds();
+
+    var startInSec = (hour*60*60) + (min*60) + sec;
+    var startTime = hour.toString() + ":" + min.toString();
     router.push({
       pathname: "sessionPage",
-      params:{hostName: name}
+      params:{hostName: name, startTime: startTime, startInSec: startInSec}
     });
   };
 

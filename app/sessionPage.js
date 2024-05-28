@@ -23,45 +23,33 @@ const sessionPage = () => {
   const [sound, setSound] = useState();
   const maxPts = 10;
   const param = useGlobalSearchParams();
-  
   const router = useRouter();
-
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
   const [hostName, setHostName] = useState("");
-  const [seconds, setSeconds] = useState(0);
-  const [isActive, setIsActive] = useState(false);
+  const [startTime, setStartTime] = useState("");
+  const [startInSec, setStartInSec] = useState(0);
+
+  const [dataSum, setDataSum] = useState(0);
+  const [dataCount, setDataCount] = useState(0);
+  const [attnSum, setAttnSum] = useState(0);
+  const [attnCount, setAttnCount] = useState(0);
+
+  const serverIpAddress = "http://192.168.132.25:3000";
+
+
 
 
   useEffect(() => {
     startHeadPoseScript();
-    setStartTime(new Date());
     setHostName(param.hostName);
+    setStartTime(param.startTime);
+    setStartInSec(param.startInSec);
   }, []);
 
-  useEffect(() => {
-    let interval;
-    if (isActive) {
-      interval = setInterval(() => {
-        setSeconds((prevSeconds) => prevSeconds + 1);
-      }, 1000);
-    } else if (!isActive && seconds !== 0) {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [isActive, seconds]);
-  const toggleTimer = () => {
-    setIsActive(!isActive);
-  };
 
-  const resetTimer = () => {
-    setSeconds(0);
-    setIsActive(false);
-  };
   const handleSessionEnd = async () => {
     try {
       const response = await axios.post(
-        "http://192.168.132.25:3000/stop-script"
+        `${serverIpAddress}/stop-script`
       );
 
       if (response.status !== 200) {
@@ -69,35 +57,44 @@ const sessionPage = () => {
       }
 
       Alert.alert("Success", "Python script ended successfully");
-      toggleTimer();
-      console.log(seconds, "DURRRATION");
-      setEndTime(new Date());
-      
-        router.replace({
+
+      var endhour = new Date().getHours();
+      var endmin = new Date().getMinutes();
+      var endsec = new Date().getSeconds();
+
+      var endInSec = (endhour * 60 * 60) + (endmin * 60) + endsec
+
+      var endTime = endhour.toString() + ":" + endmin.toString();
+
+      router.replace({
         pathname: "resultPage",
-        params:{hostName: hostName, startTime: startTime, endTime: endTime, seconds: seconds}
+        params: { hostName: hostName, startTime: startTime, endTime: endTime, startInSec: startInSec, 
+        endInSec: endInSec, dataSum: dataSum, dataCount: dataCount, attnSum: attnSum, attnCount: attnCount }
+        // , seconds: seconds}
       });
+
     } catch (error) {
       Alert.alert("Error", error.message);
     }
   };
 
   const startHeadPoseScript = async () => {
-    toggleTimer();
     try {
       const response = await axios.post(
-        "http://192.168.132.25:3000/start-python-script"
+        `${serverIpAddress}/start-python-script`
       );
+
 
       if (response.status !== 200) {
         throw new Error("Failed to execute Python script");
       }
 
-      Alert.alert("Success", "Python script executed successfully");
-      router.replace({
-        pathname: "resultPage",
-        // params:{hostName: hostName, startTime: startTime, endTime: endTime}
-      });
+      // Alert.alert("Success", "Python script executed successfully");
+
+      // router.replace({
+      //   pathname: "resultPage",
+      //   params:{hostName: hostName, startTime: startTime, endTime: endTime}
+      // });
 
     } catch (error) {
       Alert.alert("Error", error.message);
@@ -117,18 +114,18 @@ const sessionPage = () => {
   useEffect(() => {
     return sound
       ? () => {
-          sound.unloadAsync();
-        }
+        sound.unloadAsync();
+      }
       : undefined;
   }, [sound]);
 
   useEffect(() => {
-    const socket = io("http://192.168.132.25:3000", {
+    const socket = io(serverIpAddress, {
       transports: ["websocket"],
     });
 
     socket.on("update_variable", (newData) => {
-      if (newData < 50) {
+      if (newData < 71) {
         playSound();
       }
 
@@ -136,11 +133,19 @@ const sessionPage = () => {
         const newDataArray = [...prevData, newData].slice(-maxPts);
         return newDataArray;
       });
+
+      setDataSum(prevSum => prevSum + newData);
+      setDataCount(prevCount => prevCount + 1);
+
       console.log(`Recieved from server: ${newData}`);
     });
 
     socket.on("attendance", (newAttn) => {
       setCurrentAttendance(newAttn);
+
+      setAttnSum(prevSum => prevSum + newAttn);
+      setAttnCount(prevCount => prevCount + 1);
+
       console.log(`Attn Recieved from server: ${newAttn}`);
     })
 
@@ -158,7 +163,7 @@ const sessionPage = () => {
         }}
       >
         <Text style={{ fontSize: 16, fontStyle: "italic", fontWeight: "bold" }}>
-          Real-Time Attention Score 
+          Real-Time Attention Score {hostName}
         </Text>
       </View>
 
@@ -216,7 +221,7 @@ const sessionPage = () => {
         <Text style={{ fontSize: 60 }}>{currentAttendance}</Text>
 
         <Text style={{ fontSize: 16 }}>Duration : </Text>
-        <Text style={{ fontSize: 30 }}>{seconds}</Text>
+        <Text style={{ fontSize: 30 }}>100</Text>
       </View>
       <Pressable
         onPress={handleSessionEnd}

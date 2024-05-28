@@ -5,7 +5,16 @@ import { useGlobalSearchParams } from "expo-router";
 
 const resultPage = () => {
   const router = useRouter();
+  const [hostName, setHostName] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [duration, setDuration] = useState(0);
   const params = useGlobalSearchParams();
+
+  useEffect(() => {
+    setHostName(params.hostHame);
+    setStartTime(params.startTime);
+    setDuration(params.endInSec - params.startInSec);
+  })
 
   return (
     <View style={{ padding: 10 }}>
@@ -35,7 +44,7 @@ const resultPage = () => {
                 
               }}
             />
-            <Text style={{fontSize:16}}>Prof. Alex</Text>
+            <Text style={{fontSize:16}}>{params.hostName}</Text>
             <Text style={{fontWeight:"bold"}}>Lecturer Name</Text>
             
           </View>
@@ -61,7 +70,7 @@ const resultPage = () => {
                 resizeMode: "contain",
               }}
             />
-            <Text style={{fontSize:16}}>40m</Text>
+            <Text style={{fontSize:16}}>{parseFloat(duration/60).toFixed(2)} mins</Text>
             <Text style={{fontWeight:"bold"}}>Duration</Text>
           </View>
         </View>
@@ -88,7 +97,7 @@ const resultPage = () => {
                 resizeMode: "contain",
               }}
             />
-            <Text style={{fontSize:16}}>1:35 PM</Text>
+            <Text style={{fontSize:16}}>{params.startTime}</Text>
             <Text style={{fontWeight:"bold"}}>Start Time</Text>
           </View>
 
@@ -113,7 +122,7 @@ const resultPage = () => {
                 resizeMode: "contain",
               }}
             />
-            <Text style={{fontSize:16}}>2:15 PM</Text>
+            <Text style={{fontSize:16}}>{params.endTime}</Text>
             <Text style={{fontWeight:"bold"}}>End Time</Text>
           </View>
         </View>
@@ -140,7 +149,7 @@ const resultPage = () => {
                 resizeMode: "contain",
               }}
             />
-            <Text style={{fontSize:26, fontWeight:"bold"}}>79%</Text>
+            <Text style={{fontSize:26, fontWeight:"bold"}}>{parseFloat(params.dataSum / params.dataCount).toFixed(2)} %</Text>
             <Text style={{fontWeight:"bold"}}>Average Session Attention</Text>
           </View>
 
@@ -170,7 +179,7 @@ const resultPage = () => {
                 resizeMode: "contain",
               }}
             />
-            <Text style={{fontSize:26, fontWeight:"bold"}}>34</Text>
+            <Text style={{fontSize:26, fontWeight:"bold"}}>{parseFloat(params.attnSum / params.attnCount).toFixed(2)}</Text>
             <Text style={{fontWeight:"bold"}}>Average Session Attendance</Text>
           </View>
 
