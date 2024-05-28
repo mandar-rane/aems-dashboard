@@ -68,8 +68,10 @@ const sessionPage = () => {
 
       router.replace({
         pathname: "resultPage",
-        params: { hostName: hostName, startTime: startTime, endTime: endTime, startInSec: startInSec, 
-        endInSec: endInSec, dataSum: dataSum, dataCount: dataCount, attnSum: attnSum, attnCount: attnCount }
+        params: {
+          hostName: hostName, startTime: startTime, endTime: endTime, startInSec: startInSec,
+          endInSec: endInSec, dataSum: dataSum, dataCount: dataCount, attnSum: attnSum, attnCount: attnCount
+        }
         // , seconds: seconds}
       });
 

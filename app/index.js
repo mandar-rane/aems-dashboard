@@ -16,11 +16,11 @@ const Home = () => {
     var min = new Date().getMinutes();
     var sec = new Date().getSeconds();
 
-    var startInSec = (hour*60*60) + (min*60) + sec;
+    var startInSec = (hour * 60 * 60) + (min * 60) + sec;
     var startTime = hour.toString() + ":" + min.toString();
     router.push({
       pathname: "sessionPage",
-      params:{hostName: name, startTime: startTime, startInSec: startInSec}
+      params: { hostName: name, startTime: startTime, startInSec: startInSec }
     });
   };
 
@@ -48,8 +48,8 @@ const Home = () => {
           style={{
             width: 320,
             resizeMode: "contain",
-            marginBottom:20,
-            marginTop:60
+            marginBottom: 20,
+            marginTop: 60
           }}
         />
         <Text
