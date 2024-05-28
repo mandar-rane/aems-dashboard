@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "scheme": "acme",
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "name": "aems-dash",
+    "slug": "aems-dash",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f1bfc04b-9b49-498f-8098-a75076deea80"
+      }
+    },
+    "android": {
+      "package": "com.misccdr.aemsdash"
+    }
+  }
+}
